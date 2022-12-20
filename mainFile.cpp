@@ -858,6 +858,58 @@ Sedan &sedanFilterMileage(double *arr, Sedan &car1, Sedan &car2, Sedan &car3, Se
     cout << "Please enter a valid number " << endl;
     return invalid;
 }
+
+Worker* removeWorkers(string filename, Worker* workers, long id)
+{
+
+    Worker* tempW;
+    string temp;
+    int WorkersCount = (SizeOfFile(filename)) / 2;
+
+    int flag = 0;
+    for (int i = 0; i < WorkersCount; i++)
+        if (workers[i].getID() == id)
+        {
+            flag = 1;
+            break;
+        }
+
+    if (flag == 0)
+    {
+        cout << "The worker do not exist" << endl << endl;
+        return workers;
+    }
+
+    tempW = new Worker[WorkersCount - 1];
+    if (!tempW)
+    {
+        cout << "NO MEMO";
+        return 0;
+    }
+    for (int i = 0, j = 0; i < WorkersCount; i++)
+    {
+        if (workers[i].getID() == id)
+            continue;
+        tempW[j] = workers[i];
+        j++;
+    }
+    workers = tempW;
+    ofstream out(filename, ios::out);
+    if (!out)
+    {
+        cout << "Error, check file ";
+        return 0;
+    }
+    for (int i = 0; i < WorkersCount - 1; i++)
+    {
+        if (i != 0)
+            out << endl;
+        out << workers[i].getName() << endl;
+        out << workers[i].getID() << " " << workers[i].getSeniority() << " " << workers[i].getHours();
+    }
+    out.close();
+    return workers;
+}
  
 int main()
 {
@@ -1321,7 +1373,7 @@ int main()
         suvFinalCar = Suv();
         sedanFinalCar = Sedan();
     }
-    cout << "check";
+    
 
     fptr.close();
     delete[]carMileage;

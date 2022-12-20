@@ -897,6 +897,37 @@ Sedan &sedanFilterMileage(double *arr, Sedan &car1, Sedan &car2, Sedan &car3, Se
     return invalid;
 }
 
+
+Worker* AddWorker(Worker* Workers, string filename)
+{
+    string NewName;
+    long NewID;
+    int Seniority;
+    float Hours;
+    int WorkersCount = (SizeOfFile(filename)) / 2;
+    Worker* Temp = new Worker[WorkersCount + 1];
+    if (!Temp)
+    {
+        cout << "Error!";
+        return 0;
+    }
+
+    for (int i = 0; i < WorkersCount; i++)
+    {
+        Temp[i] = Workers[i];
+    }
+    cout << "please enter name of new worker: " << endl;
+    cin >> NewName;
+    cout << "please enter a ID of new worker: " << endl;
+    cin >> NewID;
+    cout << "please enter seniority: " << endl;
+    cin >> Seniority;
+    cout << "please enter hours of a new worker: " << endl;
+    cin >> Hours;
+    Temp[WorkersCount].set(NewName, NewID, Seniority, Hours);
+    ofstream file(filename, ios::app);
+    if (!file)
+
 Worker* removeWorkers(string filename, Worker* workers, long id)
 {
 
@@ -934,10 +965,20 @@ Worker* removeWorkers(string filename, Worker* workers, long id)
     workers = tempW;
     ofstream out(filename, ios::out);
     if (!out)
+
     {
         cout << "Error, check file ";
         return 0;
     }
+
+
+    file << endl << NewName << endl << NewID << " " << Seniority << " " << Hours;
+
+    file.close();
+    Workers = Temp;
+    return Workers;
+}
+
     for (int i = 0; i < WorkersCount - 1; i++)
     {
         if (i != 0)
@@ -949,6 +990,7 @@ Worker* removeWorkers(string filename, Worker* workers, long id)
     return workers;
 }
  
+
 int main()
 {
     // int chosenCar{};

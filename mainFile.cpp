@@ -927,6 +927,17 @@ Worker* AddWorker(Worker* Workers, string filename)
     Temp[WorkersCount].set(NewName, NewID, Seniority, Hours);
     ofstream file(filename, ios::app);
     if (!file)
+    {
+        cout << "Error, check file ";
+        return 0;
+    }
+
+    file << endl << NewName << endl << NewID << " " << Seniority << " " << Hours;
+
+    file.close();
+    Workers = Temp;
+    return Workers;
+}
 
 Worker* removeWorkers(string filename, Worker* workers, long id)
 {

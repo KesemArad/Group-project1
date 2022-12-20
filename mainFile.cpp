@@ -861,6 +861,7 @@ Sedan &sedanFilterMileage(double *arr, Sedan &car1, Sedan &car2, Sedan &car3, Se
 
 Worker* AddWorker(Worker* Workers, string filename)
 {
+
     string NewName;
     long NewID;
     int Seniority;

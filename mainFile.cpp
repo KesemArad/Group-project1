@@ -38,7 +38,45 @@ using std::left;
 using std::right;
 
 #define TOTAL_CARS 4
-
+Worker* initialWorkers(string filename) // Initialising the workers in the company according to stored file, if no workers yet return an empty array
+{
+    Worker* workers = NULL;
+    ifstream in(filename, ios::in);
+    if (!in)
+    {
+        cout << "Error, check file ";
+        return 0;
+    }
+    string temp;
+    int WorkersCount = SizeOfFile(filename) / 2;
+    if (WorkersCount == 0)
+        return workers;
+    workers = new Worker[WorkersCount];
+    if (!workers)
+    {
+        cout << "NO MEMO";
+        return 0;
+    }
+    in.close();
+    in.open(filename, ios::in);
+    if (!in)
+    {
+        cout << "Error, check file ";
+        return 0;
+    }
+    long id; int seniority, i = 0; float hours;
+    while (!in.eof())
+    {
+        in >> temp;
+        if (temp == "\0")
+            continue;
+        in >> id >> seniority >> hours;
+        workers[i].set(temp, id, seniority, hours);
+        i++;
+    }
+    in.close();
+    return workers;
+}
 // Base class
 class DatabaseCar
 {
@@ -46,7 +84,7 @@ protected:
     double maxSpeed;
     double mileage;
     double fuelCapacity;
-    string fuelType;
+    string fuelType ;
     int year;
     string modelName;
     double odometerReading;
@@ -859,6 +897,7 @@ Sedan &sedanFilterMileage(double *arr, Sedan &car1, Sedan &car2, Sedan &car3, Se
     return invalid;
 }
 
+
 Worker* AddWorker(Worker* Workers, string filename)
 {
     string NewName;
@@ -888,10 +927,50 @@ Worker* AddWorker(Worker* Workers, string filename)
     Temp[WorkersCount].set(NewName, NewID, Seniority, Hours);
     ofstream file(filename, ios::app);
     if (!file)
+
+Worker* removeWorkers(string filename, Worker* workers, long id)
+{
+
+    Worker* tempW;
+    string temp;
+    int WorkersCount = (SizeOfFile(filename)) / 2;
+
+    int flag = 0;
+    for (int i = 0; i < WorkersCount; i++)
+        if (workers[i].getID() == id)
+        {
+            flag = 1;
+            break;
+        }
+
+    if (flag == 0)
+    {
+        cout << "The worker do not exist" << endl << endl;
+        return workers;
+    }
+
+    tempW = new Worker[WorkersCount - 1];
+    if (!tempW)
+    {
+        cout << "NO MEMO";
+        return 0;
+    }
+    for (int i = 0, j = 0; i < WorkersCount; i++)
+    {
+        if (workers[i].getID() == id)
+            continue;
+        tempW[j] = workers[i];
+        j++;
+    }
+    workers = tempW;
+    ofstream out(filename, ios::out);
+    if (!out)
+
     {
         cout << "Error, check file ";
         return 0;
     }
+
 
     file << endl << NewName << endl << NewID << " " << Seniority << " " << Hours;
 
@@ -899,6 +978,19 @@ Worker* AddWorker(Worker* Workers, string filename)
     Workers = Temp;
     return Workers;
 }
+
+    for (int i = 0; i < WorkersCount - 1; i++)
+    {
+        if (i != 0)
+            out << endl;
+        out << workers[i].getName() << endl;
+        out << workers[i].getID() << " " << workers[i].getSeniority() << " " << workers[i].getHours();
+    }
+    out.close();
+    return workers;
+}
+ 
+
 int main()
 {
     // int chosenCar{};
@@ -1404,7 +1496,7 @@ int main()
         suvFinalCar = Suv();
         sedanFinalCar = Sedan();
     }
-    cout << "check";
+    
 
     fptr.close();
     delete[]carMileage;

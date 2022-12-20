@@ -10,7 +10,7 @@
  */
 
 #include <algorithm>
-
+#include "Worker.h"
 /*
  * Below headers are only added for delay.
  */
@@ -38,7 +38,45 @@ using std::left;
 using std::right;
 
 #define TOTAL_CARS 4
-
+Worker* initialWorkers(string filename) // Initialising the workers in the company according to stored file, if no workers yet return an empty array
+{
+    Worker* workers = NULL;
+    ifstream in(filename, ios::in);
+    if (!in)
+    {
+        cout << "Error, check file ";
+        return 0;
+    }
+    string temp;
+    int WorkersCount = SizeOfFile(filename) / 2;
+    if (WorkersCount == 0)
+        return workers;
+    workers = new Worker[WorkersCount];
+    if (!workers)
+    {
+        cout << "NO MEMO";
+        return 0;
+    }
+    in.close();
+    in.open(filename, ios::in);
+    if (!in)
+    {
+        cout << "Error, check file ";
+        return 0;
+    }
+    long id; int seniority, i = 0; float hours;
+    while (!in.eof())
+    {
+        in >> temp;
+        if (temp == "\0")
+            continue;
+        in >> id >> seniority >> hours;
+        workers[i].set(temp, id, seniority, hours);
+        i++;
+    }
+    in.close();
+    return workers;
+}
 // Base class
 class DatabaseCar
 {
@@ -46,7 +84,7 @@ protected:
     double maxSpeed;
     double mileage;
     double fuelCapacity;
-    string fuelType;
+    string fuelType ;
     int year;
     string modelName;
     double odometerReading;
@@ -998,26 +1036,69 @@ int main()
     /*
      * Functions for delay start
      */
-    sleep_for(10ns);
-    sleep_until(system_clock::now() + 2s);
+    //sleep_for(10ns);
+    //sleep_until(system_clock::now() + 2s);
 
     /*
      * Functions for delay end
      */
 
     // In-built function to clear terminal/console
-    // system("cls"); // Windows command
-    system("clear"); // Linux command
+     system("cls"); // Windows command
+    //system("clear"); // Linux command
+    cout<<"1)Worker\n2)Customer\n";
+    int initialChoice;
+    cin >> initialChoice;
+    if(initialChoice==1)
+    {
+        Worker* workers= initialWorkers("workersInfo.txt");
+        int choice;
+        do
+        {
+            cout<<"Please Choose an option:\n1)Add new worker\n2)Remove worker\n3)Worker of the month\n4)Print workers\n5)Exit\n";
+            cin>>choice;
+            switch(choice)
+            {
+                case 1:
+                {
+                    workers= AddWorker(workers, "workersInfo.txt");
+                    break;
+                }
+                case 2:
+                {
+                    long id;
+                    cout<<"Enter worker ID to remove: ";
+                    cin>>id;
+                    workers= removeWorkers("workersInfo.txt", workers, id);
+                    break;
+                }
+                case 3:
+                {
+                    BestWorkerOfTheMonth(workers,"workersInfo.txt");
+                    break;
+                }
+                case 4:
+                {
+                    for (int i = 0; i < SizeOfFile("workersInfo.txt") / 2; i++)
+                        workers[i].print();
+                    break;
+                }
+                case 5: {
+                    delete workers;
+                    return 0;
+                }
+            }
+        } while(choice>0 && choice<5);
 
+    }
     cout << "Hello Customer! " << userName << endl;
     cout << "Welcome to Car Rental System!" << endl
          << endl;
-    cout<<"try add"<<endl;
+
     cout << "Please press '1' to book a car" << endl;
     cout << "Please press '2' to exit" << endl;
 
-    int initialChoice;
-    cin >> initialChoice;
+
 
     cout << "Welcome to Car Rental System!" << endl
          << endl;

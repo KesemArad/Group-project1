@@ -858,7 +858,38 @@ Sedan &sedanFilterMileage(double *arr, Sedan &car1, Sedan &car2, Sedan &car3, Se
     cout << "Please enter a valid number " << endl;
     return invalid;
 }
-
+int SizeOfFile(const string filename)
+{
+    int numLines = 0;
+    ifstream in(filename, ios::in);
+    if (!in)
+        throw filename;
+    string temp;
+    while (!in.eof())
+    {
+        getline(in, temp);
+        if (temp == "\0")
+            continue;
+        numLines++;
+    }
+    in.close();
+    return numLines;
+}
+void BestWorkerOfTheMonth(Worker* Workers,string filename)
+{
+    int WorkerIndex = 0;
+    int Size = SizeOfFile(filename) / 2;
+    float Max = Workers[0].getHours();
+    for (int i = 1; i < Size; i++)
+    {
+        if (Workers[i].getHours() > Max)
+        {
+            Max = Workers[i].getHours();
+            WorkerIndex = i;
+        }
+    }
+    Workers[WorkerIndex].print();
+}
 Worker* AddWorker(Worker* Workers, string filename)
 {
 

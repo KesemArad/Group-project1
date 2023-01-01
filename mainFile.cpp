@@ -887,7 +887,7 @@ Worker* initialWorkers(string filename) // Initialising the workers in the compa
     long id; int seniority, i = 0; float hours;
     while (!in.eof())
     {
-        in >> temp;
+        getline(in,temp);
         if (temp == "\0")
             continue;
         in >> id >> seniority >> hours;
@@ -998,8 +998,9 @@ Worker* AddWorker(Worker* Workers, string filename)
     {
         Temp[i] = Workers[i];
     }
+    getchar();
     cout << "please enter name of new worker: " << endl;
-    cin >> NewName;
+    getline(cin,NewName);
     cout << "please enter a ID of new worker: " << endl;
     cin >> NewID;
     cout << "please enter seniority: " << endl;

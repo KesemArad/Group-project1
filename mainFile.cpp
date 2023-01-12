@@ -4,13 +4,14 @@
 #include <climits>
 #include <cstdlib>
 #include <iomanip>
+#include <cctype>
 
 /*
  * Below header file has been included only for case conversions on strings.
  */
 
 #include <algorithm>
-#include "Worker.h"
+
 /*
  * Below headers are only added for delay.
  */
@@ -22,22 +23,10 @@ using namespace std::this_thread;     // sleep_for, sleep_until
 using namespace std::chrono_literals; // ns, us, ms, s, h, etc.
 using std::chrono::system_clock;
 
-/*
- * End delay headers.
- */
-
-// To avoid using std::
-using std::cin;
-using std::cout;
-using std::endl;
-using std::fstream;
-using std::string;
-using std::vector;
-using std::setw;
-using std::left;
-using std::right;
+using namespace std;
 
 #define TOTAL_CARS 4
+#include "Worker.h"
 
 // Base class
 class DatabaseCar
@@ -858,6 +847,23 @@ Sedan &sedanFilterMileage(double *arr, Sedan &car1, Sedan &car2, Sedan &car3, Se
     cout << "Please enter a valid number " << endl;
     return invalid;
 }
+int SizeOfFile(const string filename)
+{
+    int numLines = 0;
+    ifstream in(filename, ios::in);
+    if (!in)
+        throw filename;
+    string temp;
+    while (!in.eof())
+    {
+        getline(in, temp);
+        if (temp == "\0")
+            continue;
+        numLines++;
+    }
+    in.close();
+    return numLines;
+}
 Worker* initialWorkers(string filename) // Initialising the workers in the company according to stored file, if no workers yet return an empty array
 {
     Worker* workers = NULL;
@@ -885,9 +891,10 @@ Worker* initialWorkers(string filename) // Initialising the workers in the compa
         return 0;
     }
     long id; int seniority, i = 0; float hours;
+
     while (!in.eof())
     {
-        getline(in,temp);
+        getline(in, temp);
         if (temp == "\0")
             continue;
         in >> id >> seniority >> hours;
@@ -905,7 +912,7 @@ Worker* removeWorkers(string filename, Worker* workers, long id)
     int WorkersCount = (SizeOfFile(filename)) / 2;
 
     int flag = 0;
-    for (int i = 0; i < WorkersCount; i++)
+    for (int i = 0; i < WorkersCount; i++)//checking if the worker does exist in the company
         if (workers[i].getID() == id)
         {
             flag = 1;
@@ -932,8 +939,8 @@ Worker* removeWorkers(string filename, Worker* workers, long id)
         j++;
     }
     workers = tempW;
-    ofstream out(filename,ios::out);
-    if (!out)
+    ofstream out(filename,ios::out);//the following code updates the file of workers info
+    if (!out)//because the opening of the file is not in "app" mode, the file is being cleared
     {
         cout << "Error, check file ";
         return 0;
@@ -948,38 +955,7 @@ Worker* removeWorkers(string filename, Worker* workers, long id)
     out.close();
     return workers;
 }
-int SizeOfFile(const string filename)
-{
-    int numLines = 0;
-    ifstream in(filename, ios::in);
-    if (!in)
-        throw filename;
-    string temp;
-    while (!in.eof())
-    {
-        getline(in, temp);
-        if (temp == "\0")
-            continue;
-        numLines++;
-    }
-    in.close();
-    return numLines;
-}
-void BestWorkerOfTheMonth(Worker* Workers,string filename)
-{
-    int WorkerIndex = 0;
-    int Size = SizeOfFile(filename) / 2;
-    float Max = Workers[0].getHours();
-    for (int i = 1; i < Size; i++)
-    {
-        if (Workers[i].getHours() > Max)
-        {
-            Max = Workers[i].getHours();
-            WorkerIndex = i;
-        }
-    }
-    Workers[WorkerIndex].print();
-}
+
 Worker* AddWorker(Worker* Workers, string filename)
 {
     string NewName;
@@ -1021,6 +997,23 @@ Worker* AddWorker(Worker* Workers, string filename)
     Workers = Temp;
     return Workers;
 }
+
+void BestWorkerOfTheMonth(Worker* Workers,string filename)
+{
+    int WorkerIndex = 0;
+    int Size = SizeOfFile(filename) / 2;
+    float Max = Workers[0].getHours();
+    for (int i = 1; i < Size; i++)
+    {
+        if (Workers[i].getHours() > Max)
+        {
+            Max = Workers[i].getHours();
+            WorkerIndex = i;
+        }
+    }
+    Workers[WorkerIndex].print();
+}
+
 int main()
 {
     // int chosenCar{};
@@ -1097,13 +1090,13 @@ int main()
         cout << "Please create a customerInfo.txt file and re-run this program!" << endl;
         return 0;
     }
-
+/*
     cout << "Welcome to Car Rental System!" << endl;
     cout << "Made by: " << endl;
     cout << "1. Mudit Garg " << endl;
     cout << "2. Nihar Phansalkar " << endl;
     cout << "3. Ojaswini Kohale " << endl;
-    cout << "4. P. Karthik Krishna " << endl;
+    cout << "4. P. Karthik Krishna " << endl;*/
 
     /*
      * Functions for delay start
@@ -1116,7 +1109,7 @@ int main()
      */
 
     // In-built function to clear terminal/console
-     system("cls"); // Windows command
+    system("cls"); // Windows command
     //system("clear"); // Linux command
     cout<<"1)Worker\n2)Customer\n";
     int initialChoice;
@@ -1126,43 +1119,44 @@ int main()
         Worker* workers= initialWorkers("workersInfo.txt");
         int choice;
         do
-        {
-            cout<<"Please Choose an option:\n1)Add new worker\n2)Remove worker\n3)Worker of the month\n4)Print workers\n5)Exit\n";
-            cin>>choice;
-            switch(choice)
             {
-                case 1:
-                {
-                    workers= AddWorker(workers, "workersInfo.txt");
-                    break;
-                }
-                case 2:
-                {
-                    long id;
-                    cout<<"Enter worker ID to remove: ";
-                    cin>>id;
-                    workers= removeWorkers("workersInfo.txt", workers, id);
-                    break;
-                }
-                case 3:
-                {
-                    BestWorkerOfTheMonth(workers,"workersInfo.txt");
-                    break;
-                }
-                case 4:
-                {
-                    for (int i = 0; i < SizeOfFile("workersInfo.txt") / 2; i++)
-                        workers[i].print();
-                    break;
-                }
-                case 5: {
-                    delete workers;
-                    return 0;
-                }
-            }
-        } while(choice>0 && choice<5);
+                cout<<"Please Choose an option:\n1)Add new worker\n2)Remove worker\n3)Worker of the month\n4)Print workers\n5)Exit\n";
+                cin>>choice;
+               switch(choice)
+               {
+                   case 1:
+                   {
+                       workers= AddWorker(workers, "workersInfo.txt");
+                       break;
+                   }
+                   case 2:
+                   {
+                       long id;
+                       cout<<"Enter worker ID to remove: ";
+                       cin>>id;
+                       workers= removeWorkers("workersInfo.txt", workers, id);
+                       break;
+                   }
+                   case 3:
+                   {
+                       BestWorkerOfTheMonth(workers,"workersInfo.txt");
+                       break;
+                   }
+                   case 4:
+                   {
+                       for (int i = 0; i < SizeOfFile("workersInfo.txt") / 2; i++)
+                           workers[i].print();
+                       break;
+                   }
+                   case 5: {
+                       delete workers;
+                       return 0;
+                   }
+               }
+            } while(choice>0 && choice<5);
 
     }
+
     cout << "Hello Customer! " << userName << endl;
     cout << "Welcome to Car Rental System!" << endl
          << endl;
@@ -1170,7 +1164,9 @@ int main()
     cout << "Please press '1' to book a car" << endl;
     cout << "Please press '2' to exit" << endl;
 
-
+    cin >> initialChoice;
+    if(initialChoice==2)
+        return 0;
 
     cout << "Welcome to Car Rental System!" << endl
          << endl;
@@ -1192,8 +1188,8 @@ int main()
     fptr.close();
 
     // In-built function to clear terminal/console
-    // system("cls"); // Windows command
-    system("clear"); // Linux command
+    system("cls"); // Windows command
+    //system("clear"); // Linux command
 
     int val_from_wm{}, filterValue{};
 
@@ -1319,8 +1315,8 @@ int main()
         }
 
         // In-built function to clear terminal/console
-        // system("cls"); // Windows command
-        system("clear"); // Linux command
+        system("cls"); // Windows command
+        //system("clear"); // Linux command
 
         double billPrice{};
         int days{};
@@ -1467,8 +1463,8 @@ int main()
          */
 
         // In-built function to clear terminal/console
-        // system("cls"); // Windows command
-        system("clear"); // Linux command
+         system("cls"); // Windows command
+        //system("clear"); // Linux command
 
         cout << "Hello Customer! " << endl;
         cout << "Welcome to Car Rental System!" << endl
@@ -1507,8 +1503,8 @@ int main()
         fptr.close();
 
         // In-built function to clear terminal/console
-        // system("cls"); // Windows command
-        system("clear"); // Linux command
+        system("cls"); // Windows command
+        //system("clear"); // Linux command
 
         // Resetting values
         for (int i = 0; i < TOTAL_CARS; i++)
@@ -1526,7 +1522,6 @@ int main()
         suvFinalCar = Suv();
         sedanFinalCar = Sedan();
     }
-    cout << "check";
 
     fptr.close();
     delete[]carMileage;
